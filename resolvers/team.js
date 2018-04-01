@@ -8,7 +8,8 @@ export default {
   },
 
   Mutation: {
-    addTeamMember: requiresAuth.createResolver(async (parent, { email, teamId }, { models, user }) => {
+    addTeamMember:
+    requiresAuth.createResolver(async (parent, { email, teamId }, { models, user }) => {
       try {
         const teamPromise = await models.Team.findOne({ where: { id: teamId } }, { raw: true });
         const userToAddPromise = await models.User.findOne({ where: { email } }, { raw: true });
