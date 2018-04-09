@@ -1,11 +1,23 @@
 import { tryLogin } from '../auth';
+import requiresAuth from '../permissions';
 
 import formatErrors from '../formatErrors';
 
 export default {
+  User: {
+    teams: (parent, args, { models, user }) =>
+      models.sequelize.query(
+        'select * from teams as team join members as member on team.id = member.team_id where member.user_id = ?',
+        {
+          replacements: [user.id],
+          model: models.Team,
+        },
+      ),
+  },
   Query: {
-    getUser: (parent, { id }, { models }) => models.User.findOne({ where: { id } }),
     allUsers: (parent, args, { models }) => models.User.findAll(),
+    me: requiresAuth.createResolver((parent, args, { models, user }) =>
+      models.User.findOne({ where: { id: user.id } })),
   },
   Mutation: {
     login: (parent, { email, password }, { models, SECRET, SECRET2 }) =>
